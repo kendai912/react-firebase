@@ -1,5 +1,6 @@
 import React from "react";
 import firebase from "../firebase";
+import axios from "axios";
 
 export const Item = ({ index, todo, getTodosFromFirestore }) => {
   // timestamp形式のデータをいい感じの形式に変換する関数
@@ -16,27 +17,42 @@ export const Item = ({ index, todo, getTodosFromFirestore }) => {
 
   // ↓追加 ドキュメントIDを指定してFirestoreのデータを更新する関数
   const updateDataOnFirestore = async (collectionName, documentId, isDone) => {
-    const updatedData = await firebase
-      .firestore()
-      .collection(collectionName)
-      .doc(documentId)
-      .update({
-        isDone: isDone ? false : true,
-      });
+    const newData = { isDone: isDone ? false : true };
+    const requestUrl =
+      "http://localhost:5000/react-firebase-d79a3/us-central1/api/";
+    const updatedData = await axios.put(`${requestUrl}${documentId}`, newData);
     getTodosFromFirestore();
-    return;
+    return updatedData;
   };
+  // const updateDataOnFirestore = async (collectionName, documentId, isDone) => {
+  //   const updatedData = await firebase
+  //     .firestore()
+  //     .collection(collectionName)
+  //     .doc(documentId)
+  //     .update({
+  //       isDone: isDone ? false : true,
+  //     });
+  //   getTodosFromFirestore();
+  //   return;
+  // };
 
   // ↓追加 ドキュメントIDを指定してFirestoreのデータを削除する関数
   const deleteDataOnFirestore = async (collectionName, documentId) => {
-    const removedData = await firebase
-      .firestore()
-      .collection(collectionName)
-      .doc(documentId)
-      .delete();
+    const requestUrl =
+      "http://localhost:5000/react-firebase-d79a3/us-central1/api/";
+    const removedData = await axios.delete(`${requestUrl}${documentId}`);
     getTodosFromFirestore();
-    return;
+    return removedData;
   };
+  // const deleteDataOnFirestore = async (collectionName, documentId) => {
+  //   const removedData = await firebase
+  //     .firestore()
+  //     .collection(collectionName)
+  //     .doc(documentId)
+  //     .delete();
+  //   getTodosFromFirestore();
+  //   return;
+  // };
 
   return (
     <li key={index} id={todo.id}>
@@ -57,7 +73,7 @@ export const Item = ({ index, todo, getTodosFromFirestore }) => {
       {!todo.data.isDone ? (
         <div>
           <p>
-            締め切り：{convertFromTimestampToDatetime(todo.data.limit.seconds)}
+            締め切り：{convertFromTimestampToDatetime(todo.data.limit._seconds)}
           </p>
           <p>やること：{todo.data.todo}</p>
         </div>
@@ -66,7 +82,7 @@ export const Item = ({ index, todo, getTodosFromFirestore }) => {
           <p>
             <del>
               締め切り：
-              {convertFromTimestampToDatetime(todo.data.limit.seconds)}
+              {convertFromTimestampToDatetime(todo.data.limit._seconds)}
             </del>
           </p>
           <p>

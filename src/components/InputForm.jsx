@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import firebase from "../firebase";
+import axios from "axios";
 
 export const InputForm = ({ getTodosFromFirestore }) => {
   const [todo, setTodo] = useState("");
@@ -7,12 +8,18 @@ export const InputForm = ({ getTodosFromFirestore }) => {
 
   // Firestoreにデータを送信する関数
   const postDataToFirestore = async (collectionName, postData) => {
-    const addedData = await firebase
-      .firestore()
-      .collection(collectionName)
-      .add(postData);
+    const requestUrl =
+      "http://localhost:5000/react-firebase-d79a3/us-central1/api";
+    const addedData = await axios.post(requestUrl, postData);
     return addedData;
   };
+  // const postDataToFirestore = async (collectionName, postData) => {
+  //   const addedData = await firebase
+  //     .firestore()
+  //     .collection(collectionName)
+  //     .add(postData);
+  //   return addedData;
+  // };
 
   // submitボタンクリック時の処理
   const submitData = async () => {
